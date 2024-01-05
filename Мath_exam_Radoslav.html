@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор на математически задачи</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+ 
+    #output {
+      font-size: 15px;
+      margin-top: 10px;
+    }
+ 
+    .column {
+      width: 25%;
+      float: left;
+    }
+ 
+ 
+    .task {
+      border-bottom: 1px solid #ccc;
+      padding: 5px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .number-square {
+      width: 5px;
+      height: 5px;
+      border: 1px solid black;
+      padding: 5px;
+      display: inline-block;
+      margin-right: 5px;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .check-square {
+      width: 15px;
+      height: 15px;
+      border: 1px solid black;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .check-square span {
+      font-size: 10px;
+    }
+
+    #footer {
+      margin-top: 30px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+ 
+ 
+ 
+  <label for="maxNumber">Максимално число:</label>
+  <input type="number" id="maxNumber" min="1" value="10">
+ 
+  <button onclick="generateMixedTasks()">Генерирай нов лист задачи</button>
+  <h1>"Обичам числата, обичам да смятам."</h1>
+  <div id="output"></div>
+ 
+  <script>
+    function toggleMaxNumberField() {
+      const operation = document.getElementById('operation').value;
+      const maxNumberField = document.getElementById('maxNumber');
+      const numberOfNumbersField = document.getElementById('numberOfNumbers');
+
+      // Показва или скрива полетата за въвеждане на максимално число и брой числа
+      maxNumberField.disabled = operation === 'checks';
+      numberOfNumbersField.disabled = operation !== 'addition';
+    }
+
+    function generateMixedTasks() {
+       // От по три задачи на колона за всяка операция
+      const numberOfTasks = 100;
+      const tasksPerColumn = 25;
+      let outputHtml = '';
+
+      for (let j = 0; j < numberOfTasks / tasksPerColumn; j++) {
+        outputHtml += '<div class="column">';
+
+        for (let i = 0; i < tasksPerColumn; i++) {
+          let taskHtml = '';
+
+          // Избор на случайна операция
+          const randomOperationIndex = Math.floor(Math.random() * 3); // 0, 1 или 2
+          const operation = getOperationByIndex(randomOperationIndex);
+
+          if (operation === 'checks') {
+            const numbers = Array.from({ length: 2 }, () => Math.floor(Math.random() * 10) + 1);
+            taskHtml += `<div class="task">${numbers[0]}<div class="number-square" style="margin-left: 5px;" style="margin-right: 5px;"></div>${numbers[1]}</div>`;
+          } else {
+            const maxNumber = parseInt(document.getElementById('maxNumber').value, 10);
+            let numbers;
+            let result;
+
+            do {
+              numbers = Array.from({ length: 2 }, () => Math.floor(Math.random() * maxNumber) + 1);
+
+              if (operation === 'subtraction') {
+                const sortedNumbers = numbers.sort((a, b) => b - a);
+                result = sortedNumbers[0] - sortedNumbers[1];
+              } else {
+                result = numbers.reduce((acc, num) => acc + num, 0);
+              }
+            } while (result > maxNumber);
+
+            taskHtml = `<div class="task">${numbers.join(` ${getOperationSymbol(operation)} `)} = ___ </div>`;
+          }
+
+          outputHtml += taskHtml;
+        }
+
+        outputHtml += '</div>';
+      }
+
+      // Добавяне на последния ред
+      outputHtml += '<div id="footer"><strong>Дата:</strong> ..................<br><strong>Проверил:</strong> ..................<br><strong>Оценка:</strong> 6 - Отлично ; 5 - Много Добре ; 4 - Добре ; 3 - Средно.</div>';
+
+      document.getElementById('output').innerHTML = outputHtml;
+    }
+
+    function getOperationByIndex(index) {
+      switch (index) {
+        case 0:
+          return 'addition';
+        case 1:
+          return 'subtraction';
+        case 2:
+          return 'checks';
+        default:
+          return 'addition';
+      }
+    }
+ 
+    function getOperationSymbol(operation) {
+      switch (operation) {
+        case 'addition':
+          return '+';
+        case 'subtraction':
+          return '-';
+        default:
+          return '';
+      }
+    }
+  </script>
+ 
+</body>
+</html>

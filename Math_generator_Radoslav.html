@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор на математически задачи</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+ 
+    #output {
+      font-size: 15px;
+      margin-top: 10px;
+    }
+ 
+    .column {
+      width: 25%;
+      float: left;
+    }
+ 
+    .task {
+      border-bottom: 1px solid #ccc;
+      padding: 5px;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .number-square {
+      width: 5px;
+      height: 5px;
+      border: 1px solid black;
+      padding: 5px;
+      display: inline-block;
+      margin-right: 5px;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .check-square {
+      width: 15px;
+      height: 15px;
+      border: 1px solid black;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .check-square span {
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+ 
+  <label for="operation">Избери операция:</label>
+  <select id="operation" onchange="toggleNumberOfNumbersField()">
+    <option value="addition">Събиране</option>
+    <option value="subtraction">Изваждане</option>
+    <option value="checks">Проверки</option>
+  </select>
+
+  <label for="numberOfNumbers">Брой числа:</label>
+  <input type="number" id="numberOfNumbers" min="1" value="2">
+ 
+  <label for="maxResult">Максимален резултат:</label>
+  <input type="number" id="maxResult" min="1" value="10">
+ 
+  <button onclick="generateTasks()">Генерирай нов лист задачи</button>
+  <h1>"Обичам числата, обичам да смятам."</h1>
+  <div id="output"></div>
+ 
+  <script>
+    function toggleNumberOfNumbersField() {
+      const operation = document.getElementById('operation').value;
+      const numberOfNumbersField = document.getElementById('numberOfNumbers');
+
+      // Показва или скрива полето за въвеждане на брой числа в зависимост от операцията
+      numberOfNumbersField.disabled = operation !== 'addition';
+    }
+
+    function generateTasks() {
+      const operation = document.getElementById('operation').value;
+      const numberOfNumbers = parseInt(document.getElementById('numberOfNumbers').value, 10);
+      const maxResult = parseInt(document.getElementById('maxResult').value, 10);
+      const numberOfTasks = 100;
+      const tasksPerColumn = 25;
+
+      let outputHtml = '';
+
+      for (let j = 0; j < numberOfTasks / tasksPerColumn; j++) {
+        outputHtml += '<div class="column">';
+
+        for (let i = 0; i < tasksPerColumn; i++) {
+          let taskHtml = '';
+
+          if (operation === 'checks') {
+            const numbers = Array.from({ length: numberOfNumbers }, () => Math.floor(Math.random() * maxResult) + 1);
+            taskHtml += `<div class="task">${numbers[0]}<div class="number-square" style="margin-left: 5px;" style="margin-right: 5px;"></div>${numbers[1]}</div>`;
+          } else {
+            let numbers;
+            let result;
+
+            do {
+              numbers = Array.from({ length: numberOfNumbers }, () => Math.floor(Math.random() * maxResult) + 1);
+
+              if (operation === 'subtraction') {
+                const sortedNumbers = numbers.sort((a, b) => b - a);
+                result = sortedNumbers[0] - sortedNumbers[1];
+              } else {
+                result = numbers.reduce((acc, num) => acc + num, 0);
+              }
+            } while (result > maxResult);
+
+            taskHtml = `<div class="task">${numbers.join(` ${getOperationSymbol(operation)} `)} = ___ </div>`;
+          }
+
+          outputHtml += taskHtml;
+        }
+
+        outputHtml += '</div>';
+      }
+
+      // Добавяне на последния ред
+      outputHtml += '<div id="footer" style="margin-top: 30px; line-height: 1.5;"><strong>Дата:</strong> ..................<br><strong>Проверил:</strong> ..................<br><strong>Оценка:</strong> 6 - Отлично ; 5 - Много Добре ; 4 - Добре ; 3 - Средно.</div>';
+
+      document.getElementById('output').innerHTML = outputHtml;
+    }
+ 
+    function getOperationSymbol(operation) {
+      switch (operation) {
+        case 'addition':
+          return '+';
+        case 'subtraction':
+          return '-';
+        default:
+          return '';
+      }
+    }
+  </script>
+ 
+</body>
+</html>
